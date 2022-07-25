@@ -52,6 +52,7 @@ describe('BitPaySDK.Client', () => {
         let retrievedInvoices;
         let webhookRequested;
         let paidInvoice;
+        let getInvoiceByGuid;
 
         it('should create invoice', async () => {
             invoice = await client.CreateInvoice(invoiceData);
@@ -73,6 +74,14 @@ describe('BitPaySDK.Client', () => {
             retrievedInvoice = await client.GetInvoice(invoice.id);
 
             expect(retrievedInvoice).toBeDefined();
+        });
+
+        it('should retrieve invoice by guid', async () => {
+            invoice = await client.CreateInvoice(invoiceData);
+            getInvoiceByGuid = await client.GetInvoiceByGuid(invoice.guid);
+            console.log(getInvoiceByGuid);
+
+            expect(getInvoiceByGuid).toBeDefined();
         });
 
         it('should retrieve invoice list', async () => {

@@ -294,6 +294,36 @@ To get the generated invoice details, pass the Invoice Id with URL parameter
 let invoice = await client.GetInvoice(invoice.id);
 ```
 
+## Retrieve an invoice using guid
+
+`GET /invoices/guid/:guid`
+
+Facade **`MERCHANT`**
+
+### HTTP Request
+
+**URL Parameters**
+
+| Parameter | Description | Type | Presence |
+| --- | --- | :---: | :---: |
+| ?token= | When fetching an invoice via the `merchant` facade, pass the API token as a URL parameter - the same token used to create the invoice in the first place. | `string` | **Mandatory** |
+
+**Headers**
+
+| Fields | Description | Presence |
+| --- | --- | :---: |
+| X-Accept-Version | Must be set to `2.0.0` for requests to the BitPay API. | **Mandatory** |
+| Content-Type | must be set to `application/json` for requests to the BitPay API. | **Mandatory** |
+| X-Identity | the hexadecimal public key generated from the client private key. This header is required when using tokens with higher privileges (`merchant` facade). When using standard `merchant` facade token directly from the [BitPay dashboard](https://test.bitpay.com/dashboard/merchant/api-tokens) (with `"Require Authentication"` disabled), this header is not needed. | **Mandatory** |
+| X-Signature | header is the ECDSA signature of the full request URL concatenated with the request body, signed with your private key. This header is required when using tokens with higher privileges (`merchant` facade). When using standard `merchant` facade token directly from the [BitPay dashboard](https://test.bitpay.com/dashboard/merchant/api-tokens) (with `"Require Authentication"` disabled), this header is not needed. | **Mandatory** |
+
+
+To get the generated invoice details, pass the guid with URL parameter
+
+```js
+let getInvoice = client.GetInvoiceByGuid(createInvoice.guid, Facade.Merchant, true);
+```
+
 ### Retrieve invoices filtered by query
 
 Facade `MERCHANT`
@@ -334,6 +364,41 @@ let offset = 0;
 let retrievedInvoices;
 
 retrievedInvoices = await client.GetInvoices(dateStart, dateEnd, status, null, limit, offset);
+```
+
+## Pay an invoice
+
+Update an invoice status to either **`confirmed`** or **`completed`** with a mock transaction to help speed up the testing
+
+:warning: PayInvoice is only available in Sandbox environment.
+
+`POST /invoices/pay/:invoiceId`
+
+Facades  **`MERCHANT`**
+
+### HTTP Request
+
+**URL Parameters**
+
+| Parameter | Description |Type | Presence
+| ------ | ------ | ----- |------ |
+|  ?token=  | When fetching an invoice via the merchant or the pos facade, pass the API token as a URL parameter - the same token used to create the invoice in the first place. | `string` | **Mandatory** |
+
+| Name | Description |Type | Presence
+| ------ | ------ | ----- |------ |
+|  complete  | Indicate if paid invoice should have a complete or confirmed status. Invoice status will be complete if true or confirmed if false or undefined. | `string` | :warning: |
+
+**Headers**
+
+| Fields | Description | Presence
+| ------ | ------ | ------ |
+|  X-Accept-Version  | must be set to `2.0.0` for requests to the BitPay API  | **Mandatory** |
+| Content-Type | must be set to `application/json` for requests to the BitPay API | **Mandatory** | 
+|  X-Identity  | the hexadecimal public key generated from the client private key. This header is required when using tokens with higher privileges (merchant facade). When using standard pos facade token directly from the BitPay dashboard (with "Require Authentication" disabled), this header is not needed.  | C |
+| X-Signature | header is the ECDSA signature of the full request URL concatenated with the request body, signed with your private key. This header is required when using tokens with higher privileges (merchant facade). When using standard pos facade token directly from the BitPay dashboard (with "Require Authentication" disabled), this header is not needed. | C |
+
+```js
+let paidInvoice = client.PayInvoice(invoice.id, "confirmed");
 ```
 
 ### [Back to guide index](../../GUIDE.md)
